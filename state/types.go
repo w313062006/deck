@@ -271,8 +271,7 @@ func (t1 *Target) EqualWithOpts(t2 *Target, ignoreID,
 		t2Copy.ID = nil
 	}
 	if ignoreTS {
-		t1Copy.CreatedAt = nil
-		t2Copy.CreatedAt = nil
+		// FIXME
 	}
 	if ignoreForeign {
 		t1Copy.Upstream = nil

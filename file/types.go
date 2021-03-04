@@ -90,6 +90,7 @@ func copyToService(fService FService) service {
 	s.Tags = fService.Tags
 	s.Routes = fService.Routes
 	s.Plugins = fService.Plugins
+	s.URL = fService.URL
 
 	return s
 }

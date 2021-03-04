@@ -30,9 +30,6 @@ type FService struct {
 	kong.Service
 	Routes  []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
 	Plugins []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
-
-	// sugar property
-	URL *string `json:"url,omitempty" yaml:",omitempty"`
 }
 
 // id is used for sorting.

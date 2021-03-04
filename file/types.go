@@ -63,9 +63,7 @@ type service struct {
 	CACertificates    []*string  `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
 	Routes            []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
 	Plugins           []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
-
-	// sugar property
-	URL *string `json:"url,omitempty" yaml:",omitempty"`
+	URL               *string    `json:"url,omitempty" yaml:"url,omitempty"`
 }
 
 func copyToService(fService FService) service {

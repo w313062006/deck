@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/kong/deck/konnect"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
 	"github.com/pkg/errors"
@@ -103,31 +103,6 @@ func (kc *KongClientConfig) ForWorkspace(name string) KongClientConfig {
 	return result
 }
 
-// HeaderRoundTripper injects Headers into requests
-// made via RT.
-type HeaderRoundTripper struct {
-	headers []string
-	rt      http.RoundTripper
-}
-
-// RoundTrip satisfies the RoundTripper interface.
-func (t *HeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response,
-	error) {
-	newRequest := new(http.Request)
-	*newRequest = *req
-	newRequest.Header = make(http.Header, len(req.Header))
-	for k, s := range req.Header {
-		newRequest.Header[k] = append([]string(nil), s...)
-	}
-	for _, s := range t.headers {
-		split := strings.SplitN(s, ":", 2)
-		if len(split) >= 2 {
-			newRequest.Header[split[0]] = append([]string(nil), split[1])
-		}
-	}
-	return t.rt.RoundTrip(newRequest)
-}
-
 // GetKongClient returns a Kong client
 func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 
@@ -156,10 +131,15 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	defaultTransport.TLSClientConfig = &tlsConfig
 	c.Transport = defaultTransport
 	if len(opt.Headers) > 0 {
-		c.Transport = &HeaderRoundTripper{
-			headers: opt.Headers,
-			rt:      defaultTransport,
+
+		headers := http.Header{}
+		for _, keyValue := range opt.Headers {
+			split := strings.SplitN(keyValue, ":", 2)
+			if len(split) >= 2 {
+				headers[split[0]] = []string{split[1]}
+			}
 		}
+		*c = kong.HTTPClientWithHeaders(c, headers)
 	}
 	address := CleanAddress(opt.Address)
 
